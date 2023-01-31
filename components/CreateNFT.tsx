@@ -8,8 +8,21 @@ import {
 } from "@solana/web3.js";
 import { FC, useCallback } from "react";
 import { NFTStorage, Blob, File } from "nft.storage";
-import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js";
-import { createVerifyCollectionInstruction, createSetAndVerifyCollectionInstruction, SetAndVerifyCollectionInstructionAccounts } from "@metaplex-foundation/mpl-token-metadata";
+import {
+    Metaplex,
+    walletAdapterIdentity,
+    TransactionBuilder,
+} from "@metaplex-foundation/js";
+import {
+    createVerifyCollectionInstruction,
+    createSetAndVerifyCollectionInstruction,
+    SetAndVerifyCollectionInstructionAccounts,
+    VerifyInstructionAccounts,
+    VerifyCollectionInstructionAccounts,
+    VerifySizedCollectionItemInstructionAccounts,
+    createVerifySizedCollectionItemInstruction,
+} from "@metaplex-foundation/mpl-token-metadata";
+import { metaplex } from "@metaplex/js/lib/programs";
 
 export const CreateNFT: FC = () => {
     const { connection } = useConnection();
@@ -18,7 +31,6 @@ export const CreateNFT: FC = () => {
     const SOL_PRICE_OF_LIKE = 0.1;
 
     const NFTSTORAGE_API_KEY = process.env.NFTSTORAGE_API_KEY;
-        
 
     //REMOVE HARDCODED AUTHORS & SHARES LATER
     const authors = [
@@ -58,8 +70,12 @@ export const CreateNFT: FC = () => {
             alert("Wallet not Connected!");
             return;
         }
-        const metaplex = Metaplex.make(connection).use(walletAdapterIdentity(wallet))
-        const nftstorage_client = new NFTStorage({ token: NFTSTORAGE_API_KEY! });
+        const metaplex = Metaplex.make(connection).use(
+            walletAdapterIdentity(wallet)
+        );
+        const nftstorage_client = new NFTStorage({
+            token: NFTSTORAGE_API_KEY!,
+        });
 
         // const img_data : any = readFileSync("/Users/martin/Stuff/Projects/journalist_next_testing/ticket_img.png");
         // const type : any = mime.getType("/Users/martin/Stuff/Projects/journalist_next_testing/ticket_img.png");
@@ -99,24 +115,53 @@ export const CreateNFT: FC = () => {
             // const cid = await nftstorage_client.storeBlob(blob);
             // console.log("====================")
             // console.log(cid);
-            const temp_metadata_uri = "https://bafkreicagv2rcxcgyn67ptn7iycyysm2tl4s4wnnrrb4j76lyztygqh2ey.ipfs.nftstorage.link/"
-            
-            const nft = await metaplex.nfts().create({uri: temp_metadata_uri, name: "Justin Bieber 2023", symbol: "JB23",sellerFeeBasisPoints: 1000, isCollection: true, 
-                                    collection: new PublicKey("FQWLCYAzRtra9dQgGnjchGBbiFtuVwHozZEi1XwRoRnm")});
-            
-            
-            const lmao : SetAndVerifyCollectionInstructionAccounts = {metadata: nft.metadataAddress, 
-                                                                        collectionAuthority: wallet.publicKey!,
-                                                                        payer: wallet.publicKey!,
-                                                                        updateAuthority: wallet.publicKey!,
-                                                                        collectionMint: nft.mintAddress,
-                                                                        collection: nft.metadataAddress,
-                                                                        collectionMasterEditionAccount: nft.masterEditionAddress,
-                                                                    }
-            const ix = createSetAndVerifyCollectionInstruction(lmao)
-            transaction.add(ix)
-            sendTransaction(transaction, connection);
+            const temp_metadata_uri =
+                "https://bafkreicagv2rcxcgyn67ptn7iycyysm2tl4s4wnnrrb4j76lyztygqh2ey.ipfs.nftstorage.link/";
 
+            const collection_nft = await metaplex
+                .nfts()
+                .findByMint({
+                    mintAddress: new PublicKey(
+                        "FQWLCYAzRtra9dQgGnjchGBbiFtuVwHozZEi1XwRoRnm"
+                    ),
+                });
+
+            const nft = await metaplex
+                .nfts()
+                .create({
+                    uri: temp_metadata_uri,
+                    name: "Justin Bieber 2023",
+                    symbol: "JB23",
+                    sellerFeeBasisPoints: 1000,
+                    isCollection: true,
+                    collection: new PublicKey(
+                        "FQWLCYAzRtra9dQgGnjchGBbiFtuVwHozZEi1XwRoRnm"
+                    ),
+                });
+
+            // const nft = await metaplex.nfts().findByMint({mintAddress: new PublicKey("DrQeius4na8MDR6d9mtALgjEbVHb21xVkpjQ7noZuuhV")});
+
+            const g: VerifySizedCollectionItemInstructionAccounts = {
+                metadata: nft.metadataAddress,
+                collectionAuthority: metaplex.identity().publicKey,
+                payer: metaplex.identity().publicKey,
+                collectionMint: collection_nft.address,
+                collection: collection_nft.metadataAddress,
+                collectionMasterEditionAccount: collection_nft.edition.address,
+            };
+
+            const ix = createVerifySizedCollectionItemInstruction(g);
+
+            const txlmao = TransactionBuilder.make()
+                .setFeePayer(metaplex.identity())
+                .add({
+                    instruction: ix,
+                    signers: [metaplex.identity()],
+                });
+            await txlmao.sendAndConfirm(metaplex);
+            // transaction.add(ix)
+            // // sendTransaction(transaction, connection);
+            // console.log(transaction)
 
             // const tx = await sendTransaction(transaction, connection);
             // await connection.confirmTransaction({
