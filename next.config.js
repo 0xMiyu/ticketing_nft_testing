@@ -9,4 +9,4 @@ const env = {
     NFTSTORAGE_API_KEY: process.env.NFTSTORAGE_API_KEY,
 };
 
-module.exports = nextConfig;
+module.exports = {nextConfig, env};
