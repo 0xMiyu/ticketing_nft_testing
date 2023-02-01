@@ -8,6 +8,7 @@ require('@solana/wallet-adapter-react-ui/styles.css');
 import { GetArticle } from '../components/getArticle';
 import { UploadArticle } from '../components/uploadArticle';
 import { CreateNFT } from '../components/CreateNFT';
+import { CreateCollection } from '../components/CreateCollection';
 
 export default function Home() {
   return (
@@ -31,6 +32,8 @@ export default function Home() {
         {/* <button style={{fontSize: "1.6em", backgroundColor:"purple", borderRadius:"10%"}}>
           Pay
         </button> */}
+        <CreateCollection/>
+        <br />
         <CreateNFT />
         <br />
         

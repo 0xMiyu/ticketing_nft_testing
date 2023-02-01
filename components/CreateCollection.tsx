@@ -20,7 +20,7 @@ import {
     createVerifySizedCollectionItemInstruction,
 } from "@metaplex-foundation/mpl-token-metadata";
 
-export const CreateNFT: FC = () => {
+export const CreateCollection: FC = () => {
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
     const wallet = useWallet();
@@ -74,54 +74,39 @@ export const CreateNFT: FC = () => {
 
         const transaction = new Transaction();
         try {
-            
+            // const metadata = {
+            //     name: ticketData.title,
+            //     symbol: "TKT",
+            //     description: ticketData.description,
+            //     image: temp_nft_img_link,
+            //     properties: {
+            //         files: [
+            //             {
+            //                 uri: temp_nft_img_link,
+            //                 type: "image/png",
+            //                 cdn: true,
+            //             },
+            //             {
+            //                 uri: temp_nft_img_ipfs,
+            //                 type: "image/png",
+            //                 cdn: false,
+            //             },
+            //         ],
+            //         category: "image",
+            //         creators: ticketData.royalties,
+            //     },
+            // };
+            // const blob = new Blob([JSON.stringify(metadata, null, 2)], {
+            //     type: "application/json",
+            //   });
+            // const cid = await nftstorage_client.storeBlob(blob);
+            // console.log("====================")
+            // console.log(cid);
             const temp_metadata_uri =
                 "https://bafkreicagv2rcxcgyn67ptn7iycyysm2tl4s4wnnrrb4j76lyztygqh2ey.ipfs.nftstorage.link/";
 
-            const collection_nft = await metaplex
-                .nfts()
-                .findByMint({
-                    mintAddress: new PublicKey(
-                        "FQWLCYAzRtra9dQgGnjchGBbiFtuVwHozZEi1XwRoRnm"
-                    ),
-                });
-
-            const nft = await metaplex
-                .nfts()
-                .create({
-                    uri: temp_metadata_uri,
-                    name: "Justin Bieber 2023",
-                    symbol: "JB23",
-                    sellerFeeBasisPoints: 1000,
-                    isCollection: true,
-                    collection: new PublicKey(
-                        "FQWLCYAzRtra9dQgGnjchGBbiFtuVwHozZEi1XwRoRnm"
-                    ),
-                });
-
-            // const nft = await metaplex.nfts().findByMint({mintAddress: new PublicKey("DrQeius4na8MDR6d9mtALgjEbVHb21xVkpjQ7noZuuhV")});
             
-            const ix_accounts: VerifySizedCollectionItemInstructionAccounts = {
-                metadata: nft.metadataAddress,
-                collectionAuthority: metaplex.identity().publicKey,
-                payer: metaplex.identity().publicKey,
-                collectionMint: collection_nft.address,
-                collection: collection_nft.metadataAddress,
-                collectionMasterEditionAccount: collection_nft.edition.address,
-            };
-
-            const ix = createVerifySizedCollectionItemInstruction(ix_accounts);
-
-            const tx = TransactionBuilder.make()
-                .setFeePayer(metaplex.identity())
-                .add({
-                    instruction: ix,
-                    signers: [metaplex.identity()],
-                });
-
-            await tx.sendAndConfirm(metaplex);
             alert("Transaction Confirmed!");
-
         } catch (error: any) {
             alert(error);
             console.log(error);
@@ -132,9 +117,9 @@ export const CreateNFT: FC = () => {
         <div style = {{height: "60px"}}>
             <button
                 onClick={onClick}
-                style = {{height: "60px", background: "slategrey" , borderRadius: "10%"}}
+                style = {{height: "60px", background: 'slateblue', borderRadius: "10%"}}
             >
-                <span>Create Consumer NFT</span>
+                <span>Create Collection NFT</span>
             </button>
         </div>
     );
