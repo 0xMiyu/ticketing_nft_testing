@@ -10,16 +10,8 @@ import {
     walletAdapterIdentity,
     TransactionBuilder,
 } from "@metaplex-foundation/js";
-import {
-    createVerifyCollectionInstruction,
-    createSetAndVerifyCollectionInstruction,
-    SetAndVerifyCollectionInstructionAccounts,
-    VerifyInstructionAccounts,
-    VerifyCollectionInstructionAccounts,
-    VerifySizedCollectionItemInstructionAccounts,
-    createVerifySizedCollectionItemInstruction,
-} from "@metaplex-foundation/mpl-token-metadata";
 
+//test
 export const CreateCollection: FC = () => {
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
@@ -29,6 +21,7 @@ export const CreateCollection: FC = () => {
 
     const ticketData = {
         title: "Justin Bieber World Tour 2023",
+        symbol: "JB23",
         description: "Justin sings some songs and stuff idk",
         schedule: [
             { date: 24042023, time: 1900 },
@@ -74,34 +67,34 @@ export const CreateCollection: FC = () => {
 
         const transaction = new Transaction();
         try {
-            // const metadata = {
-            //     name: ticketData.title,
-            //     symbol: "TKT",
-            //     description: ticketData.description,
-            //     image: temp_nft_img_link,
-            //     properties: {
-            //         files: [
-            //             {
-            //                 uri: temp_nft_img_link,
-            //                 type: "image/png",
-            //                 cdn: true,
-            //             },
-            //             {
-            //                 uri: temp_nft_img_ipfs,
-            //                 type: "image/png",
-            //                 cdn: false,
-            //             },
-            //         ],
-            //         category: "image",
-            //         creators: ticketData.royalties,
-            //     },
-            // };
-            // const blob = new Blob([JSON.stringify(metadata, null, 2)], {
-            //     type: "application/json",
-            //   });
-            // const cid = await nftstorage_client.storeBlob(blob);
-            // console.log("====================")
-            // console.log(cid);
+            const metadata = {
+                name: ticketData.title,
+                symbol: ticketData.symbol,
+                description: ticketData.description,
+                image: temp_nft_img_link,
+                properties: {
+                    files: [
+                        {
+                            uri: temp_nft_img_link,
+                            type: "image/png",
+                            cdn: true,
+                        },
+                        {
+                            uri: temp_nft_img_ipfs,
+                            type: "image/png",
+                            cdn: false,
+                        },
+                    ],
+                    category: "image",
+                    creators: ticketData.royalties,
+                },
+            };
+            const blob = new Blob([JSON.stringify(metadata, null, 2)], {
+                type: "application/json",
+              });
+            const cid = await nftstorage_client.storeBlob(blob);
+            console.log("====================")
+            console.log(cid);
             const temp_metadata_uri =
                 "https://bafkreicagv2rcxcgyn67ptn7iycyysm2tl4s4wnnrrb4j76lyztygqh2ey.ipfs.nftstorage.link/";
 
