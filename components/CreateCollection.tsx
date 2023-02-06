@@ -57,7 +57,6 @@ export const CreateCollection: FC = () => {
         const temp_nft_img_ipfs =
             "ipfs://bafybeiflvon2jde7ww4rftt2wzdjqn2bek7ixeixbm6aib52fbluqqerem/1042.png";
 
-        const transaction = new Transaction();
         try {
             const metadata = {
                 name: ticketData.title,
@@ -88,7 +87,7 @@ export const CreateCollection: FC = () => {
             console.log("===Metadata URI===");
             console.log(uri);
 
-            alert("Transaction Confirmed!");
+            alert("Metadata Upload Success!");
         } catch (error: any) {
             alert(error);
             console.log(error);

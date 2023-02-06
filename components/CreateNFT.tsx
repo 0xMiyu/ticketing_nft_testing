@@ -27,30 +27,6 @@ export const CreateNFT: FC = () => {
 
     const NFTSTORAGE_API_KEY = process.env.NFTSTORAGE_API_KEY;
 
-    const ticketData = {
-        title: "Justin Bieber World Tour 2023",
-        description: "Justin sings some songs and stuff idk",
-        schedule: [
-            { date: 24042023, time: 1900 },
-            { date: 25042023, time: 1900 },
-        ],
-        pricing: [
-            { category: "A", price: 300, quantity: 500 },
-            { category: "B", price: 200, quantity: 1000 },
-            { category: "C", price: 100, quantity: 1500 },
-        ],
-        royalties: [
-            {
-                address: "7WNRBicA8MmZ5U7gnKZ6FhgVwZrfa915zZ8QS8vYL2sj",
-                share: 1000,
-            },
-            {
-                address: "FkvNBs5TruvbAuUkrKdBXZW9zJSrRi6ZrV8n5Fjnad7F",
-                share: 5000,
-            },
-        ],
-    };
-
     const onClick = useCallback(async () => {
         if (!publicKey) {
             console.log("error", "Wallet not connected!");
@@ -60,19 +36,7 @@ export const CreateNFT: FC = () => {
         const metaplex = Metaplex.make(connection).use(
             walletAdapterIdentity(wallet)
         );
-        const nftstorage_client = new NFTStorage({
-            token: NFTSTORAGE_API_KEY!,
-        });
-
-        // const img_data : any = readFileSync("/Users/martin/Stuff/Projects/journalist_next_testing/ticket_img.png");
-        // const type : any = mime.getType("/Users/martin/Stuff/Projects/journalist_next_testing/ticket_img.png");
-        // const nft_img = new File(img_data, "ticketimg", type)
-        const temp_nft_img_link =
-            "https://nftstorage.link/ipfs/bafybeiflvon2jde7ww4rftt2wzdjqn2bek7ixeixbm6aib52fbluqqerem/1042.png";
-        const temp_nft_img_ipfs =
-            "ipfs://bafybeiflvon2jde7ww4rftt2wzdjqn2bek7ixeixbm6aib52fbluqqerem/1042.png";
-
-        const transaction = new Transaction();
+        
         try {
             
             const temp_metadata_uri =
