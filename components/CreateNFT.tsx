@@ -42,14 +42,14 @@ export const CreateNFT: FC = () => {
             const temp_metadata_uri =
                 "https://bafkreicagv2rcxcgyn67ptn7iycyysm2tl4s4wnnrrb4j76lyztygqh2ey.ipfs.nftstorage.link/";
 
-            const collection_nft = await metaplex
+            const collection_nft : any = await metaplex
                 .nfts()
                 .findByMint({
                     mintAddress: new PublicKey(
                         "FQWLCYAzRtra9dQgGnjchGBbiFtuVwHozZEi1XwRoRnm"
                     ),
                 });
-
+            
             const nft = await metaplex
                 .nfts()
                 .create({

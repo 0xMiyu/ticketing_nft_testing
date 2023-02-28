@@ -81,8 +81,6 @@ export const CreateCollection: FC = () => {
                 },
             };
             
-            // const temp_metadata_uri =
-            //     "https://bafkreicagv2rcxcgyn67ptn7iycyysm2tl4s4wnnrrb4j76lyztygqh2ey.ipfs.nftstorage.link/";
             const uri = await metaplex.nfts().uploadMetadata(metadata);
             console.log("===Metadata URI===");
             console.log(uri);
