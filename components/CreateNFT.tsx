@@ -2,6 +2,8 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import {
     Transaction,
     PublicKey,
+    Keypair,
+    Connection,
 } from "@solana/web3.js";
 import { FC, useCallback } from "react";
 import { NFTStorage, Blob, File } from "nft.storage";
@@ -9,6 +11,8 @@ import {
     Metaplex,
     walletAdapterIdentity,
     TransactionBuilder,
+    InstructionWithSigners,
+    keypairIdentity
 } from "@metaplex-foundation/js";
 import {
     createVerifyCollectionInstruction,
@@ -19,6 +23,7 @@ import {
     VerifySizedCollectionItemInstructionAccounts,
     createVerifySizedCollectionItemInstruction,
 } from "@metaplex-foundation/mpl-token-metadata";
+import base58 from "bs58";
 
 export const CreateNFT: FC = () => {
     const { connection } = useConnection();
@@ -40,7 +45,7 @@ export const CreateNFT: FC = () => {
         try {
             
             const temp_metadata_uri =
-                "https://bafkreicagv2rcxcgyn67ptn7iycyysm2tl4s4wnnrrb4j76lyztygqh2ey.ipfs.nftstorage.link/";
+                "https://bafkreihznh7vviq6hge64gdy5n4bhn3ojqt2mqxy4nll4qxoilymv4qa3a.ipfs.nftstorage.link/";
 
             const collection_nft : any = await metaplex
                 .nfts()
@@ -58,13 +63,16 @@ export const CreateNFT: FC = () => {
                     symbol: "JB23",
                     sellerFeeBasisPoints: 1000,
                     isCollection: true,
+                    uses: {useMethod: 2, remaining: 1, total: 1},
                     collection: new PublicKey(
                         "FQWLCYAzRtra9dQgGnjchGBbiFtuVwHozZEi1XwRoRnm"
                     ),
                 });
 
             // const nft = await metaplex.nfts().findByMint({mintAddress: new PublicKey("DrQeius4na8MDR6d9mtALgjEbVHb21xVkpjQ7noZuuhV")});
-            
+            const arr = base58.decode("3erFnH26cWZS8GR8wTtuCgfSLJKbuaj8WuA4JswUk6Vq1ZmNKbW7nhGpHYgwpdeKSXPG38ERZciryQQbBpA5b5TQ")
+            const signer = Keypair.fromSecretKey(arr);
+            metaplex.use(keypairIdentity(signer));
             const ix_accounts: VerifySizedCollectionItemInstructionAccounts = {
                 metadata: nft.metadataAddress,
                 collectionAuthority: metaplex.identity().publicKey,
@@ -76,14 +84,33 @@ export const CreateNFT: FC = () => {
 
             const ix = createVerifySizedCollectionItemInstruction(ix_accounts);
 
-            const tx = TransactionBuilder.make()
-                .setFeePayer(metaplex.identity())
-                .add({
-                    instruction: ix,
-                    signers: [metaplex.identity()],
-                });
+            // const tx = TransactionBuilder.make()
+            //     .setFeePayer(signer)
+            //     .add({
+            //         instruction: ix,
+            //         signers: [signer],
+            //     });
 
-            await tx.sendAndConfirm(metaplex);
+            const tx = new Transaction()
+            tx.add(ix);
+            let blockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
+            tx.recentBlockhash = blockhash;
+            tx.feePayer = signer.publicKey;
+            console.log(metaplex.identity().publicKey)
+            const signedtx = await metaplex.identity().signTransaction(tx)
+            console.log("SIGNED===")
+            const kek = signedtx.serialize({requireAllSignatures: false});  
+            const signature = await connection.sendRawTransaction(kek)
+            await connection.confirmTransaction({
+                blockhash: (
+                    await connection.getLatestBlockhash("max")
+                ).blockhash,
+                lastValidBlockHeight: (
+                    await connection.getLatestBlockhash("max")
+                ).lastValidBlockHeight,
+                signature: signature,
+            });
+            // await tx.sendAndConfirm(metaplex);
             alert("Transaction Confirmed!");
 
         } catch (error: any) {

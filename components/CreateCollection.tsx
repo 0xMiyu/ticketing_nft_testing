@@ -58,11 +58,16 @@ export const CreateCollection: FC = () => {
             "ipfs://bafybeiflvon2jde7ww4rftt2wzdjqn2bek7ixeixbm6aib52fbluqqerem/1042.png";
 
         try {
-            const metadata = {
+            const collection_NFT_metadata = {
                 name: ticketData.title,
                 symbol: ticketData.symbol,
                 description: ticketData.description,
                 image: temp_nft_img_link,
+                attributes: [
+                    { trait_type: "Category", value: "A" },
+                    { trait_type: "Date", value: "24/04/2023" },
+                    { trait_type: "Time", value: "7pm" },
+                ],
                 properties: {
                     files: [
                         {
@@ -80,8 +85,10 @@ export const CreateCollection: FC = () => {
                     creators: ticketData.royalties,
                 },
             };
-            
-            const uri = await metaplex.nfts().uploadMetadata(metadata);
+
+            const uri = await metaplex
+                .nfts()
+                .uploadMetadata(collection_NFT_metadata);
             console.log("===Metadata URI===");
             console.log(uri);
 
